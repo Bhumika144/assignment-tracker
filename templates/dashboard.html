@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header Section -->
+        <header class="dashboard-header">
+            <h1>Welcome, {{ username }}!</h1>
+            <div class="user-actions">
+                <a href="{{ url_for('profile') }}" class="btn-profile">Profile</a>
+                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <!-- Left Column -->
+            <div class="dashboard-left">
+                <!-- Notification Section -->
+                {% if due_soon %}
+                <section class="notification-card card">
+                    <div class="card-header">
+                        <h2>⚠️ Upcoming Assignments</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="assignment-list">
+                            {% for assignment in due_soon %}
+                            <li class="assignment-item">
+                                <span class="assignment-name">{{ assignment[0] }}</span>
+                                <span class="assignment-due">Due: {{ assignment[1] }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+                {% endif %}
+
+                <!-- Summary Section -->
+                <section class="summary-card card">
+                    <div class="card-header">
+                        <h2>📚 Your Summary</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-value">{{ subject_count }}</span>
+                                <span class="stat-label">Total Subjects</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">{{ total_assignments }}</span>
+                                <span class="stat-label">Total Assignments</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value completed">{{ completed_assignments }}</span>
+                                <span class="stat-label">Completed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value pending">{{ pending_assignments }}</span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Next Assignment Section -->
+                <section class="next-assignment-card card">
+                    <div class="card-header">
+                        <h2>📌 Next Assignment</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if upcoming %}
+                        <div class="upcoming-assignment">
+                            <h3 class="assignment-title">{{ upcoming[0] }}</h3>
+                            <p class="assignment-due-date">Due: {{ upcoming[1] }}</p>
+                        </div>
+                        {% else %}
+                        <div class="no-assignments">
+                            <p>No upcoming assignments 🎉</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column -->
+            <div class="dashboard-right">
+                <!-- Progress Chart Section -->
+                <section class="chart-card card">
+                    <div class="card-header">
+                        <h2>Assignment Progress</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Achievements Section -->
+                <section class="achievements-card card">
+                    <div class="card-header">
+                        <h2>🎖️ Achievements</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if achievements %}
+                        <div class="badges-container">
+                            {% for ach in achievements %}
+                            <div class="badge-item" title="{{ ach[1] }}">
+                                <span class="badge-icon">🏆</span>
+                                <span class="badge-name">{{ ach[0] }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="no-achievements">
+                            <p>No achievements yet. Complete assignments to earn badges!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <!-- Quick Links Section -->
+                <section class="quick-links-card card">
+                    <div class="card-header">
+                        <h2>🔗 Quick Links</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="links-list">
+                            <li><a href="{{ url_for('manage_subjects') }}" class="link-item">Manage Subjects</a></li>
+                            <li><a href="{{ url_for('assignments') }}" class="link-item">Manage Assignments</a></li>
+                            <li><a href="{{ url_for('profile') }}" class="link-item">Edit Profile</a></li>
+                            <li><a href="{{ url_for('logout') }}" class="link-item">Logout</a></li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Pending'],
+                datasets: [{
+                    label: 'Assignments Progress',
+                    data: [{{ completed_assignments }}, {{ pending_assignments }}],
+                    backgroundColor: ['#28a745', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Assignment Completion Progress'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

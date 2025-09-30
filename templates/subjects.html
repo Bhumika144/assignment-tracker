@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Subjects</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="subjects-page">
+    <div class="subjects-container">
+        <h2>Manage Subjects</h2>
+
+        <!-- Flash Messages -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="subjects-stats">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-number">{{ subjects|length }}</div>
+                <div class="stat-label">Total Subjects</div>
+            </div>
+        </div>
+
+        <!-- Add Subject Section -->
+        <section class="add-subject-section">
+            <h3>Add New Subject</h3>
+            <form method="post" class="add-subject-form">
+                <div class="subject-input-group">
+                    <label class="form-label">Subject Name</label>
+                    <input type="text" name="name" placeholder="Enter subject name..." class="subject-input" required>
+                </div>
+                <button type="submit" class="add-subject-btn">Add Subject</button>
+            </form>
+        </section>
+
+        <!-- Subjects List Section -->
+        <section class="subjects-list-section">
+            <h3>Your Subjects</h3>
+            
+            {% if subjects %}
+            <ul class="subjects-list">
+                {% for sub in subjects %}
+                <li class="subject-item">
+                    <div class="subject-info">
+                        <div class="subject-icon {{ sub[2].lower().split(' ')[0] if sub[2].lower().split(' ')[0] in ['math', 'science', 'english', 'history', 'art'] else 'default' }}">
+                            {{ sub[2][0].upper() }}
+                        </div>
+                        <div class="subject-name">{{ sub[2] }}</div>
+                    </div>
+                    
+                    <div class="subject-actions">
+                        <a href="{{ url_for('delete_subject', subject_id=sub[0]) }}" 
+                           class="delete-subject-btn"
+                           onclick="return confirm('Are you sure you want to delete this subject? All assignments in this subject will also be deleted.');">
+                            Delete Subject
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state">
+                <i>📚</i>
+                <h4>No subjects yet</h4>
+                <p>Add your first subject using the form above!</p>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- Back to Dashboard -->
+        <div class="back-link">
+            <a href="/dashboard" class="back-btn">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

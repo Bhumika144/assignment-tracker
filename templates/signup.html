@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="signup-page">
+    <div class="signup-container">
+        <h2>Create Your Account</h2>
+        
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <form method="post" class="signup-form">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" class="form-input" required 
+                       oninput="validateUsername(this)">
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" class="form-input" required 
+                       oninput="validatePassword(this)">
+                <div class="password-strength">
+                    <div class="strength-bar" id="password-strength-bar"></div>
+                </div>
+            </div>
+            
+            <div class="terms-group">
+                <input type="checkbox" id="terms" name="terms" class="terms-checkbox" required>
+                <label for="terms" class="terms-label">
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <button type="submit" class="signup-btn">Create Account</button>
+        </form>
+        
+        <div class="signup-links">
+            <p class="mt-20">
+                <a href="/login" class="login-link">Already have an account? Login</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function validatePassword(input) {
+            const password = input.value;
+            const strengthBar = document.getElementById('password-strength-bar');
+            
+            // Reset classes
+            strengthBar.className = 'strength-bar';
+            input.classList.remove('valid-input', 'invalid-input');
+            
+            if (password.length === 0) {
+                return;
+            }
+            
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 8) strength += 1;
+            
+            // Complexity checks
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            
+            // Update strength bar
+            if (strength <= 1) {
+                strengthBar.classList.add('strength-weak');
+                input.classList.add('invalid-input');
+            } else if (strength <= 2) {
+                strengthBar.classList.add('strength-medium');
+                input.classList.add('valid-input');
+            } else {
+                strengthBar.classList.add('strength-strong');
+                input.classList.add('valid-input');
+            }
+        }
+        
+        function validateUsername(input) {
+            const username = input.value;
+            input.classList.remove('valid-input', 'invalid-input');
+            
+            if (username.length === 0) return;
+            
+            if (username.length >= 3 && /^[a-zA-Z0-9_]+$/.test(username)) {
+                input.classList.add('valid-input');
+            } else {
+                input.classList.add('invalid-input');
+            }
+        }
+    </script>
+</body>
+</html>
